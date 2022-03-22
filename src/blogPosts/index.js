@@ -60,10 +60,27 @@ blogPostsRouter.get("/:blogPostId", async (req, res, next) => {
 blogPostsRouter.put("/:blogPostId", async (req, res, next) => {
   try {
     console.log("➡️ PING - REQUEST");
+    let dataToInsert = {};
+    const temp = { $set: {} };
+    if (req.body.author) {
+      for (let key in req.body.author) {
+        temp.$set[`author.${key}`] = req.body.author[key];
+      }
+    }
+    if (req.body.readTimeValue) {
+      for (let key in req.body.author) {
+        temp.$set[`author.${key}`] = req.body.author[key];
+      }
+    }
+
+    const { author, ...rest } = req.body;
+
+    dataToInsert = { ...rest, ...temp };
+    console.log(dataToInsert);
 
     const updatedBlogPost = await BlogPostModel.findByIdAndUpdate(
       req.params.blogPostId,
-      req.body,
+      dataToInsert,
       { new: true, runValidators: true }
     );
     if (updatedBlogPost) {

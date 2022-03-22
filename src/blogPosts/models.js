@@ -13,7 +13,7 @@ const blogPostSchema = new Schema(
     },
     author: {
       name: { type: String, required: true },
-      avatar: { type: String, required: true },
+      avatar: { type: String },
     },
     content: { type: String, required: true },
   },
