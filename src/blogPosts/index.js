@@ -7,7 +7,7 @@ const blogPostsRouter = express.Router();
 //1 POST
 blogPostsRouter.post("/", async (req, res, next) => {
   try {
-    console.log("➡️ PING - REQUEST");
+    console.log("📨 PING - POST REQUEST");
 
     const newBlogPost = new BlogPostModel(req.body);
 
@@ -23,7 +23,7 @@ blogPostsRouter.post("/", async (req, res, next) => {
 //2 GET ALL
 blogPostsRouter.get("/", async (req, res, next) => {
   try {
-    console.log("➡️ PING - REQUEST");
+    console.log("➡️ PING - GET ALL REQUEST");
 
     const data = await BlogPostModel.find();
     res.send(data);
@@ -36,7 +36,7 @@ blogPostsRouter.get("/", async (req, res, next) => {
 //3 GET ONE
 blogPostsRouter.get("/:blogPostId", async (req, res, next) => {
   try {
-    console.log("➡️ PING - REQUEST");
+    console.log("➡️ PING - GET ONE REQUEST");
 
     const blogPost = await BlogPostModel.findById(req.params.blogPostId);
 
