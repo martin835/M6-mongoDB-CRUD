@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import listEndpoints from "express-list-endpoints";
 import cors from "cors";
 import blogPostsRouter from "./blogPosts/index.js";
+import blogPostsCommentsRouter from "./blogPosts/comments/index.js";
 
 const server = express();
 const port = process.env.port || 5001;
@@ -14,7 +15,7 @@ server.use(express.json());
 
 //***********************************Endpoints*********************************************************/
 
-server.use("/blogPosts", blogPostsRouter);
+server.use("/blogPosts", [blogPostsRouter, blogPostsCommentsRouter]);
 
 //***********************************Error handlers****************************************************/
 
