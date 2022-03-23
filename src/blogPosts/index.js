@@ -154,35 +154,133 @@ blogPostsRouter.post("/:blogPostId/comments", async (req, res, next) => {
 });
 
 //7 GET COMMENTS for  a BlogPost
-blogPostsRouter.post("/:blogPostId/comments", async (req, res, next) => {
+blogPostsRouter.get("/:blogPostId/comments", async (req, res, next) => {
   try {
     console.log("➡️ PING - GET ALL COMMENTs REQUEST");
+
+    const blogPostComments = await BlogPostModel.findById(
+      req.params.blogPostId
+    );
+    if (blogPostComments) {
+      res.send(blogPostComments.comments);
+    } else {
+      next(
+        createError(
+          404,
+          `Blog post with id ${req.params.blogPostId} not found!`
+        )
+      );
+    }
   } catch (error) {
     console.log(error);
+    next(error);
   }
 });
 //8 GET ONE COMMENT from a BlogPost
-blogPostsRouter.post("/:blogPostId/comments", async (req, res, next) => {
-  try {
-    console.log("➡️ PING - GET a COMMENT REQUEST");
-  } catch (error) {
-    console.log(error);
+blogPostsRouter.get(
+  "/:blogPostId/comments/:commentId",
+  async (req, res, next) => {
+    try {
+      console.log("➡️ PING - GET a COMMENT REQUEST");
+
+      const blogPost = await BlogPostModel.findById(req.params.blogPostId);
+      if (blogPost) {
+        const comment = blogPost.comments.find(
+          (comment) => comment._id.toString() === req.params.commentId
+        );
+
+        if (comment) {
+          res.send(comment);
+        } else {
+          next(
+            createError(
+              404,
+              `Comment with id ${req.params.commentId} not found!`
+            )
+          );
+        }
+      } else {
+        next(
+          createError(
+            404,
+            `Blog post with id ${req.params.blogPostId} not found!`
+          )
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
   }
-});
+);
 //9 EDIT a COMMENT in a BlogPost
-blogPostsRouter.post("/:blogPostId/comments", async (req, res, next) => {
-  try {
-    console.log("➡️ PING - EDIT a COMMENT REQUEST");
-  } catch (error) {
-    console.log(error);
+blogPostsRouter.put(
+  "/:blogPostId/comments/:commentId",
+  async (req, res, next) => {
+    try {
+      console.log("➡️ PING - EDIT a COMMENT REQUEST");
+
+      const blogPost = await BlogPostModel.findById(req.params.blogPostId);
+      if (blogPost) {
+        const index = blogPost.comments.findIndex(
+          (comment) => comment._id.toString() === req.params.commentId
+        );
+        if (index !== -1) {
+          blogPost.comments[index] = {
+            ...blogPost.comments[index].toObject(),
+            ...req.body,
+          };
+
+          await blogPost.save();
+
+          res.send(blogPost);
+        } else {
+          next(
+            createError(
+              404,
+              `Comment with id ${req.params.commentId} not found!`
+            )
+          );
+        }
+      } else {
+        next(
+          createError(
+            404,
+            `Blog post with id ${req.params.blogPostId} not found!`
+          )
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
   }
-});
+);
 //10 DELETE A COMMENT in a BlogPost
-blogPostsRouter.post("/:blogPostId/comments", async (req, res, next) => {
-  try {
-    console.log("➡️ PING - DELETE a COMMENT REQUEST");
-  } catch (error) {
-    console.log(error);
+blogPostsRouter.delete(
+  "/:blogPostId/comments/:commentId",
+  async (req, res, next) => {
+    try {
+      console.log("➡️ PING - DELETE a COMMENT REQUEST");
+
+      const modifiedBlogPost = await BlogPostModel.findByIdAndUpdate(
+        req.params.blogPostId, //what
+        { $pull: { comments: { _id: req.params.commentId } } }, //how
+        { new: true } //options
+      );
+      if (modifiedBlogPost) {
+        res.send(modifiedBlogPost);
+      } else {
+        next(
+          createError(
+            404,
+            `Blog post with id ${req.params.blogPostId} not found!`
+          )
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
-});
+);
 export default blogPostsRouter;
