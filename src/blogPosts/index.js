@@ -4,7 +4,7 @@ import createError from "http-errors";
 
 const blogPostsRouter = express.Router();
 
-//1 POST
+//1 POST a BlogPost
 blogPostsRouter.post("/", async (req, res, next) => {
   try {
     console.log("📨 PING - POST REQUEST");
@@ -20,7 +20,7 @@ blogPostsRouter.post("/", async (req, res, next) => {
   }
 });
 
-//2 GET ALL
+//2 GET ALL BlogPosts
 blogPostsRouter.get("/", async (req, res, next) => {
   try {
     console.log("➡️ PING - GET ALL REQUEST");
@@ -33,7 +33,7 @@ blogPostsRouter.get("/", async (req, res, next) => {
   }
 });
 
-//3 GET ONE
+//3 GET ONE BlogPost
 blogPostsRouter.get("/:blogPostId", async (req, res, next) => {
   try {
     console.log("➡️ PING - GET ONE REQUEST");
@@ -56,7 +56,7 @@ blogPostsRouter.get("/:blogPostId", async (req, res, next) => {
   }
 });
 
-//4 EDIT ONE
+//4 EDIT ONE BlogPost
 blogPostsRouter.put("/:blogPostId", async (req, res, next) => {
   try {
     console.log("➡️ PING - REQUEST");
@@ -99,10 +99,10 @@ blogPostsRouter.put("/:blogPostId", async (req, res, next) => {
   }
 });
 
-//5 DELETE ONE
+//5 DELETE ONE BlogPost
 blogPostsRouter.delete("/:blogPostId", async (req, res, next) => {
   try {
-    console.log("➡️ PING - REQUEST");
+    console.log("➡️ PING - DELETE BlogPost REQUEST");
     const deleteBlogPost = await BlogPostModel.findByIdAndDelete(
       req.params.blogPostId
     );
@@ -122,4 +122,67 @@ blogPostsRouter.delete("/:blogPostId", async (req, res, next) => {
   }
 });
 
+//6  POST a COMMENT to a BlogPost
+blogPostsRouter.post("/:blogPostId/comments", async (req, res, next) => {
+  try {
+    console.log("➡️ PING - POST a COMMENT REQUEST");
+
+    const newComment = {
+      ...req.body,
+      commentDate: new Date(),
+    };
+
+    const blogPost = await BlogPostModel.findByIdAndUpdate(
+      req.params.blogPostId,
+      { $push: { comments: newComment } },
+      { new: true, runValidators: true }
+    );
+
+    if (blogPost) {
+      res.send(blogPost);
+    } else {
+      next(
+        createError(
+          404,
+          `Blog post with id ${req.params.blogPostId} not found!`
+        )
+      );
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+//7 GET COMMENTS for  a BlogPost
+blogPostsRouter.post("/:blogPostId/comments", async (req, res, next) => {
+  try {
+    console.log("➡️ PING - GET ALL COMMENTs REQUEST");
+  } catch (error) {
+    console.log(error);
+  }
+});
+//8 GET ONE COMMENT from a BlogPost
+blogPostsRouter.post("/:blogPostId/comments", async (req, res, next) => {
+  try {
+    console.log("➡️ PING - GET a COMMENT REQUEST");
+  } catch (error) {
+    console.log(error);
+  }
+});
+//9 EDIT a COMMENT in a BlogPost
+blogPostsRouter.post("/:blogPostId/comments", async (req, res, next) => {
+  try {
+    console.log("➡️ PING - EDIT a COMMENT REQUEST");
+  } catch (error) {
+    console.log(error);
+  }
+});
+//10 DELETE A COMMENT in a BlogPost
+blogPostsRouter.post("/:blogPostId/comments", async (req, res, next) => {
+  try {
+    console.log("➡️ PING - DELETE a COMMENT REQUEST");
+  } catch (error) {
+    console.log(error);
+  }
+});
 export default blogPostsRouter;
