@@ -24,4 +24,15 @@ const blogPostSchema = new Schema(
   { timestamps: true }
 );
 
+blogPostSchema.static("findBlogs", async function (mongoQuery) {
+  const total = await this.countDocuments(mongoQuery.criteria);
+  const data = await this.find(mongoQuery.criteria)
+    .limit(mongoQuery.options.limit || 10)
+    .skip(mongoQuery.options.skip || 0)
+    .sort(mongoQuery.options.sort)
+    .populate({ path: "author" });
+
+  return { total, data };
+});
+
 export default model("blogPost", blogPostSchema);

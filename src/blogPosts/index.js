@@ -29,12 +29,8 @@ blogPostsRouter.get("/", async (req, res, next) => {
     console.log("REQ QUERY: ", req.query);
     console.log("QUERY-TO-MONGO: ", q2m(req.query));
     const mongoQuery = q2m(req.query);
-    const total = await BlogPostModel.countDocuments(mongoQuery.criteria);
-    const data = await BlogPostModel.find(mongoQuery.criteria)
-      .limit(mongoQuery.options.limit || 10)
-      .skip(mongoQuery.options.skip || 0)
-      .sort(mongoQuery.options.sort)
-      .populate({ path: "author" });
+
+    const { total, data } = await BlogPostModel.findBlogs(mongoQuery);
 
     res.send({
       links: mongoQuery.links(
