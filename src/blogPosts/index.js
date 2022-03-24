@@ -33,7 +33,9 @@ blogPostsRouter.get("/", async (req, res, next) => {
     const data = await BlogPostModel.find(mongoQuery.criteria)
       .limit(mongoQuery.options.limit || 10)
       .skip(mongoQuery.options.skip || 0)
-      .sort(mongoQuery.options.sort);
+      .sort(mongoQuery.options.sort)
+      .populate({ path: "author" });
+
     res.send({
       links: mongoQuery.links(
         `http://localhost:${process.env.PORT}/blogPosts`,
@@ -54,7 +56,9 @@ blogPostsRouter.get("/:blogPostId", async (req, res, next) => {
   try {
     console.log("➡️ PING - GET ONE REQUEST");
 
-    const blogPost = await BlogPostModel.findById(req.params.blogPostId);
+    const blogPost = await BlogPostModel.findById(
+      req.params.blogPostId
+    ).populate({ path: "author" });
 
     if (blogPost) {
       res.send(blogPost);
