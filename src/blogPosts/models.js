@@ -20,6 +20,12 @@ const blogPostSchema = new Schema(
         commentDate: { type: Date, required: true },
       },
     ],
+    likes: [
+      {
+        userId: { type: mongoose.Types.ObjectId, ref: "User" },
+        _id: false,
+      },
+    ],
   },
   { timestamps: true }
 );

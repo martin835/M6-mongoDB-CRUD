@@ -5,6 +5,7 @@ import cors from "cors";
 import blogPostsRouter from "./blogPosts/index.js";
 import blogPostsCommentsRouter from "./blogPosts/comments/index.js";
 import authorsRouter from "./authors/index.js";
+import usersRouter from "./users/index.js";
 
 const server = express();
 const port = process.env.port || 5001;
@@ -18,6 +19,7 @@ server.use(express.json());
 
 server.use("/blogPosts", [blogPostsRouter, blogPostsCommentsRouter]);
 server.use("/authors", authorsRouter);
+server.use("/users", usersRouter);
 
 //***********************************Error handlers****************************************************/
 

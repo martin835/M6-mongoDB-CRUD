@@ -3,6 +3,8 @@ import express from "express";
 import createError from "http-errors";
 import q2m from "query-to-mongo";
 import blogPostsCommentsRouter from "./comments/index.js";
+import likesModel from "./likesModel.js";
+import UsersModel from "../users/model.js";
 
 const blogPostsRouter = express.Router();
 
@@ -134,6 +136,66 @@ blogPostsRouter.delete("/:blogPostId", async (req, res, next) => {
     }
   } catch (error) {
     console.log(error);
+    next(error);
+  }
+});
+
+//6 POST LIKE TO BLOG POST
+
+blogPostsRouter.post("/:blogPostId/likes", async (req, res, next) => {
+  console.log("👍 PING - LIKE REQUEST");
+  try {
+    // we are going to receive bookId and quantity from req.body
+    const { userId } = req.body;
+
+    // 0. Does blog post exist?
+
+    const blogPost = await BlogPostModel.findById(req.params.blogPostId);
+    if (!blogPost)
+      return next(
+        createError(404, `Blog post with id ${req.params.blogPostId} not found`)
+      );
+
+    // 1. Does user exist?
+
+    const user = await UsersModel.findById(userId);
+    if (!user)
+      return next(createError(404, `User with id ${userId} not found`));
+
+    // 2. Is the blog post already liked by specified userId?
+    const isBlogPostLiked = await BlogPostModel.findOne({
+      _id: req.params.blogPostId,
+      "likes.userId": user._id,
+    });
+
+    if (isBlogPostLiked) {
+      // 3.1 If it is there --> remove like
+
+      const modifiedLikes = await BlogPostModel.findOneAndUpdate(
+        {
+          _id: req.params.blogPostId,
+        },
+        {
+          $pull: { likes: { userId: userId } }, // in JS --> find index of the element --> products[index].quantity += quantity
+        },
+        {
+          new: true,
+        }
+      );
+      res.send(modifiedLikes);
+    } else {
+      // 3.2 If it is not --> add like
+      const modifiedLikes = await BlogPostModel.findOneAndUpdate(
+        { _id: req.params.blogPostId }, // WHAT we want to modify
+        { $push: { likes: { userId: user._id } } }, // HOW we want to modify the record
+        {
+          new: true, // OPTIONS
+          upsert: true, // if the like of that blog post is not found --> just create it automagically please
+        }
+      );
+      res.send(modifiedLikes);
+    }
+  } catch (error) {
     next(error);
   }
 });
